@@ -30,29 +30,37 @@ def get_script(delay, variation, errors):
     var variation = {variation};
     var errors = {errors};
 """ + """
-    var e = document.getElementById('simple_reaction_time_stimulus')
     var count = 0;
-    var observer = new MutationObserver(function (event) {
-    console.log(event);
-    if (count % 2 == 1) {
-        var del = errors > 0 ? 0 : delay + (Math.random() * variation - variation / 2);
-        errors -= 1;
 
+    const press_space = del => {
+        var press_down = new KeyboardEvent('keydown',{'keyCode':32,'which':32});
+        setTimeout(
+            () => document.dispatchEvent(press_down),
+            del,
+        );
+    };
 
-        var x = document.getElementById("simple_reaction_time_stimulus");
-        console.log("clicked!");
-        var ee = new KeyboardEvent('keydown',{'keyCode':32,'which':32});
-        setTimeout( function () { document.dispatchEvent(ee); }, del);
-    }
-    count += 1;
-    });
+    const callback = event => {
+        console.log(event);
+        if (count % 2 == 1) {
+            var del = errors > 0 ? 0 : delay + (Math.random() * variation - variation / 2);
+            errors -= 1;
 
+            // var x = document.getElementById("simple_reaction_time_stimulus");
+            console.log("clicked!");
+            press_space(del);
+        }
+        count += 1;
+    };
+
+    var e = document.getElementById('simple_reaction_time_stimulus');
+    var observer = new MutationObserver(callback);
     // TODO ok I need odd ones
     observer.observe(e, {
-    attributes: true,
-    attributeFilter: ['class'],
-    childList: false,
-    characterData: false
+        attributes: true,
+        attributeFilter: ['class'],
+        childList: false,
+        characterData: false
     });
     """
 
