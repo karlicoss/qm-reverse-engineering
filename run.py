@@ -26,11 +26,12 @@ driver.implicitly_wait(2)
 
 def get_script(delay, variation, errors):
     return f"""
-    var delay = {delay};
-    var variation = {variation};
-    var errors = {errors};
+    const delay = {delay};
+    const variation = {variation};
+    const errors = {errors};
 """ + """
     var count = 0;
+    var err_count = 0;
 
     const press_space = del => {
         var press_down = new KeyboardEvent('keydown',{'keyCode':32,'which':32});
@@ -42,19 +43,30 @@ def get_script(delay, variation, errors):
 
     const callback = event => {
         console.log(event);
-        if (count % 2 == 1) {
-            var del = errors > 0 ? 0 : delay + (Math.random() * variation - variation / 2);
-            errors -= 1;
 
-            // var x = document.getElementById("simple_reaction_time_stimulus");
-            console.log("clicked!");
-            press_space(del);
+        const is_green = count % 2 == 1;
+
+        var del;
+        if (err_count < errors) {
+            // TODO assert !is_green?
+            del = 5;
+            count += 2; // mmm...
+            err_count += 1;
+            console.log("pressing error!")
+        } else {
+            count += 1;
+            if (is_green) {
+                del = delay + (Math.random() * variation - variation / 2);
+                console.log("pressing green!");
+            } else {
+                return;
+            }
         }
-        count += 1;
+        press_space(del);
     };
 
-    var e = document.getElementById('simple_reaction_time_stimulus');
-    var observer = new MutationObserver(callback);
+    const e = document.getElementById('simple_reaction_time_stimulus');
+    const observer = new MutationObserver(callback);
     // TODO ok I need odd ones
     observer.observe(e, {
         attributes: true,
@@ -76,9 +88,32 @@ def run_test(delay: int, variation: int = 10, errors: int = 0):
     return results.text
 
 
+from results import results
 
-for delay in [20, 50, 100, 200, 400]:
-    sys.stdout.write(f"Running for delay {delay:5}... ")
-    res = run_test(delay)
-    sys.stdout.write(res + "\n")
+def has_result(delay, errors):
+    ll = [x for x in results if x['delay'] == delay and x['errors'] == errors]
+    return len(ll) > 0
 
+for delay in [
+        20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190,
+        200, 210, 220, 230, 240, 250,
+        260, 270, 280, 290,
+        300, 350, 400,
+]:
+    for errors in [
+            0, 1, 2, 3, # 4, 5, 6, 7, 8, 9, 10,
+    ]:
+        # TODO be careful about it...
+        if has_result(delay, errors):
+            # print("SKIPPING", delay, errors)
+            pass
+            # continue
+        while True:
+            try:
+                res = run_test(delay=delay, errors=errors)
+                sys.stdout.write(f"{{ 'delay': {delay:4}, 'errors': {errors:3}, ")
+                sys.stdout.flush()
+                sys.stdout.write(f"'res': '{res}' }},\n")
+                break
+            except Exception as e:
+                pass # try again
