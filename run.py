@@ -14,18 +14,11 @@ driver = get_chrome_driver(
     profile_dir='/tmp/qm-chrome-profile',
 )
 
-# driver.get('http://www.quantified-mind.com/')
-# driver.get('http://www.quantified-mind.com/lab/take_tests/6156220076392448')
-# driver.implicitly_wait(2)
-# cont_button = driver.find_element_by_xpath('//*[@id="mental-variables-form"]/input')
-# cont_button.click()
-# driver.implicitly_wait(2)
 
-from js_scripts import get_script
-# http://www.quantified-mind.com/tests/feature_match/practice
-def run_test(test_url: str, params: Dict):
+def run_test(test_url: str, script_getter, params: Dict):
     driver.get(test_url)
-    driver.execute_script(get_script(**params))
+    # TODO eh, not much point passing params, is there?
+    driver.execute_script(script_getter(**params))
     start_button = driver.find_element_by_xpath('//*[@id="start_button"]')
     start_button.click()
     result_sel = 'body > div.container > div.row > div.test_left.span9.test_finished > div.test_content > table > tbody > tr > td:nth-child(2)'
@@ -35,6 +28,9 @@ def run_test(test_url: str, params: Dict):
     return results.text
 
 def run_simple_reaction():
+    from js_scripts import get_simple_reaction_script
+    TEST_URL = 'http://www.quantified-mind.com/tests/simple_reaction_time/practice'
+
     from results import results
     def has_result(delay, errors):
         ll = [x for x in results if x['delay'] == delay and x['errors'] == errors]
@@ -59,7 +55,8 @@ def run_simple_reaction():
             while True:
                 try:
                     res = run_test(
-                        'http://www.quantified-mind.com/tests/simple_reaction_time/practice',
+                        TEST_URL,
+                        script_getter=get_simple_reaction_script,
                         params=dict(
                             delay=delay,
                             errors=errors,
@@ -74,5 +71,32 @@ def run_simple_reaction():
                     print(e)
                     pass # try again
 
+def run_visual_matching():
+    from js_scripts import get_visual_matching_script
+    TEST_URL = "http://www.quantified-mind.com/tests/feature_match/practice"
+    for delay in [
+            # ok, so my delay was 742 on average... so let's do from 20 to 1000 in steps of 20?
+            *range(20, 1200, 20),
+            *range(30, 1200, 20),
+    ]:
+        for errors in [
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+        ]:
+            res = run_test(
+                TEST_URL,
+                script_getter=get_visual_matching_script,
+                params=dict(
+                    delay=delay,
+                    errors=errors,
+                    variation=10,
+                )
+            )
+            sys.stdout.write(f"{{ 'delay': {delay:4}, 'errors': {errors:3}, ")
+            sys.stdout.flush()
+            sys.stdout.write(f"'res': '{res}' }},\n")
 
-run_simple_reaction()
+
+# run_simple_reaction()
+
+
+run_visual_matching()
