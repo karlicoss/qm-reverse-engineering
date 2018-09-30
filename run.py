@@ -30,8 +30,10 @@ def get_script(delay, variation, errors):
     const variation = {variation};
     const errors = {errors};
 """ + """
+    const total = 20;
     var count = 0;
     var err_count = 0;
+    var corr_count = 0;
 
     const press_space = del => {
         var press_down = new KeyboardEvent('keydown',{'keyCode':32,'which':32});
@@ -47,7 +49,7 @@ def get_script(delay, variation, errors):
         const is_green = count % 2 == 1;
 
         var del;
-        if (err_count < errors) {
+        if (err_count < errors) { //  && corr_count == total - errors // add that to make errors in the end..
             // TODO assert !is_green?
             del = 5;
             count += 2; // mmm...
@@ -57,6 +59,7 @@ def get_script(delay, variation, errors):
             count += 1;
             if (is_green) {
                 del = delay + (Math.random() * variation - variation / 2);
+                corr_count += 1;
                 console.log("pressing green!");
             } else {
                 return;
@@ -95,19 +98,24 @@ def has_result(delay, errors):
     return len(ll) > 0
 
 for delay in [
-        20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190,
-        200, 210, 220, 230, 240, 250,
-        260, 270, 280, 290,
-        300, 350, 400,
+                   20,  30,  40,  50,  60,  70,  80,  90,
+        100, 110, 120, 130, 140, 150, 160, 170, 180, 190,
+        200, 210, 220, 230, 240, 250, 260, 270, 280, 290,
+        300, 310, 320, 330, 340, 350, 360, 370, 380, 390,
+        400, 410, 420, 430, 440, 450, 460, 470, 480, 490,
+        500, 510, 520, 530, 540, 550, 560, 570, 580, 590,
+        600, 610, 620, 630, 640, 650, 660, 670, 680, 690,
 ]:
     for errors in [
-            0, 1, 2, 3, # 4, 5, 6, 7, 8, 9, 10,
+            0,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            17, 18, 19,
     ]:
         # TODO be careful about it...
         if has_result(delay, errors):
             # print("SKIPPING", delay, errors)
-            pass
-            # continue
+            # pass
+            continue
         while True:
             try:
                 res = run_test(delay=delay, errors=errors)
