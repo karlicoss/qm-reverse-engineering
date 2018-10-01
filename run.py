@@ -9,13 +9,25 @@ from selenium.webdriver.common.by import By # type: ignore
 from selenium.webdriver.support.ui import WebDriverWait # type: ignore
 from selenium.webdriver.support import expected_conditions as EC # type: ignore
 
-driver = get_chrome_driver(
-    headless=False,
-    profile_dir='/tmp/qm-chrome-profile',
-)
+def get_qm_driver():
+    driver = get_chrome_driver(
+        headless=False,
+        profile_dir='/tmp/qm-chrome-profile',
+    )
+    # err, okay, apparently it is necessary to log onto training session..
+    driver.get('http://www.quantified-mind.com/lab/take_tests/6156220076392448')
+    driver.implicitly_wait(2)
+    cont_button = driver.find_element_by_xpath('//*[@id="mental-variables-form"]/input')
+    cont_button.click()
+    driver.implicitly_wait(2)
+    return driver
 
+driver = None
 
 def run_test(test_url: str, script_getter, params: Dict):
+    global driver
+    if driver is None:
+        driver = get_qm_driver()
     driver.get(test_url)
     # TODO eh, not much point passing params, is there?
     driver.execute_script(script_getter(**params))
@@ -68,10 +80,10 @@ def run_simple_reaction():
                     sys.stdout.write(f"'res': '{res}' }},\n")
                     break
                 except Exception as e:
-                    print(e)
                     pass # try again
 
 def run_visual_matching():
+    global driver
     from js_scripts import get_visual_matching_script
     TEST_URL = "http://www.quantified-mind.com/tests/feature_match/practice"
     for delay in [
@@ -82,21 +94,28 @@ def run_visual_matching():
         for errors in [
                 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
         ]:
-            res = run_test(
-                TEST_URL,
-                script_getter=get_visual_matching_script,
-                params=dict(
-                    delay=delay,
-                    errors=errors,
-                    variation=10,
-                )
-            )
-            sys.stdout.write(f"{{ 'delay': {delay:4}, 'errors': {errors:3}, ")
-            sys.stdout.flush()
-            sys.stdout.write(f"'res': '{res}' }},\n")
+            while True:
+                try:
+                    res = run_test(
+                        TEST_URL,
+                        script_getter=get_visual_matching_script,
+                        params=dict(
+                            delay=delay,
+                            errors=errors,
+                            variation=10,
+                        )
+                    )
+                    sys.stdout.write(f"{{ 'delay': {delay:4}, 'errors': {errors:3}, ")
+                    sys.stdout.flush()
+                    sys.stdout.write(f"'res': '{res}' }},\n")
+                    break
+                except Exception as e:
+                    print("GETTING NEW DRIVER!")
+                    if driver is not None:
+                        driver.quit() # just in case...
+                        driver = None
 
 
 # run_simple_reaction()
-
 
 run_visual_matching()
