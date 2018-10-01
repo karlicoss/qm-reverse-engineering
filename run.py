@@ -110,5 +110,13 @@ def run_visual_matching():
         ],
     )
 
-run_simple_reaction()
-# run_visual_matching()
+# run_simple_reaction()
+run_visual_matching()
+
+# ok, so it's possible to get pretty high score on matching by answering some correctly and others on random just to shift time enough
+# although I have to admit, it takes a while to do that
+# TODO ah, looks like it computes reaction time among correct answers? well that makes it a bit harder...
+# ok, so on the one hand I'm barely performing better than random
+# on the other hand it seems to be pretty hard
+# yup! I can beat it with strategy like 'guess few correctly and then press so reach 400ms average'
+# ok, so what? that would be quite hard without immediate feedback. but still, pretty weird.

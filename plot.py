@@ -32,12 +32,20 @@ def plot_results(results, title, plot_name, maxdelay, maxerrors, step=20):
                 res = float(rr['res'].split()[0])
                 errs.append(errors)
                 vals.append(res)
+
+                if errors == 0:
+                    plt.annotate(
+                        str(delay),
+                        xy=(-0.3, res),
+                        fontsize=8,
+                    )
         if len(errs) > 0:
             ints = int(delay / maxdelay * 255)
             hv = hex(ints)[2:]
             if len(hv) == 1:
                 hv = "0" + hv
             sns.lineplot(errs, vals, label=f"{delay:3} ms", linewidth=3, color='#{cc}0000'.format(cc=hv))
+
 
 
     plt.tight_layout()
