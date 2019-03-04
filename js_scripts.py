@@ -1,9 +1,8 @@
-def get_simple_reaction_script(**params):
-    return """
+SIMPLE_REACTION_SCRIPT = """
     const delay = {delay};
     const variation = {variation};
     const errors = {errors};
-""".format(**params) + """
+""" + """
     const total = 20;
     var count = 0;
     var err_count = 0;
@@ -51,50 +50,49 @@ def get_simple_reaction_script(**params):
         childList: false,
         characterData: false
     });
-    """
+    """.replace('{', '{{').replace('}', '}}')
 
-def get_visual_matching_script(**params):
-    return """
-const delay = {delay};
-const variation = {variation};
-const errors = {errors};
-""".format(**params) + """
+VISUAL_MATCHING_SCRIPT = """
+    const delay = {delay};
+    const variation = {variation};
+    const errors = {errors};
+""" + """
 
-function matches() {
-var tl = document.getElementById('stimulus_left' ).firstChild.firstChild.firstChild;
-var tr = document.getElementById('stimulus_right').firstChild.firstChild.firstChild;
-for (var i = 0; i < 8; i++) {
-    for (var j = 0; j < 8; j++) {
-        var cl = tl.children[i].children[j].className;
-        var cr = tr.children[i].children[j].className;
-        if (cl != cr) {
-            return false;
+    function matches() {
+    var tl = document.getElementById('stimulus_left' ).firstChild.firstChild.firstChild;
+    var tr = document.getElementById('stimulus_right').firstChild.firstChild.firstChild;
+    for (var i = 0; i < 8; i++) {
+        for (var j = 0; j < 8; j++) {
+            var cl = tl.children[i].children[j].className;
+            var cr = tr.children[i].children[j].className;
+            if (cl != cr) {
+                return false;
+            }
         }
     }
-}
-return true;
-}
+    return true;
+    }
 
 
-const e = document.getElementById('stimulus_left' );
+    const e = document.getElementById('stimulus_left' );
 
-var count = 0;
-var err_count = 0;
-var observer = new MutationObserver(function (event) {
-    console.log(count);
-   if (count % 2 == 0) {
-       setTimeout( function () {
-            var key = (matches() ^ (errors > err_count)) ? 39 : 37;
-            err_count += 1;
+    var count = 0;
+    var err_count = 0;
+    var observer = new MutationObserver(function (event) {
+        console.log(count);
+       if (count % 2 == 0) {
+           setTimeout( function () {
+                var key = (matches() ^ (errors > err_count)) ? 39 : 37;
+                err_count += 1;
 
-            var ee = new KeyboardEvent('keydown',{'keyCode':key,'which':key});
-            document.dispatchEvent(ee);
-    }, delay + (Math.random() * variation - variation / 2));
-   }
-   count += 1;
-});
+                var ee = new KeyboardEvent('keydown',{'keyCode':key,'which':key});
+                document.dispatchEvent(ee);
+        }, delay + (Math.random() * variation - variation / 2));
+       }
+       count += 1;
+    });
 
-observer.observe(e, {
-  childList: true,
-});
-    """
+    observer.observe(e, {
+      childList: true,
+    });
+    """.replace('{', '{{').replace('}', '}}')
