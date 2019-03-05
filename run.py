@@ -67,6 +67,7 @@ class Runner:
             except Exception as e:
                 exc = e
                 print(f"{e}: getting new driver... (attempt {attempt})")
+                time.sleep(5)
                 self._reset()
         else:
             assert exc is not None
@@ -111,51 +112,6 @@ def run_test(test_url, js_script_template: str, delays: List, errors: List, stat
             print(f'  result: {res}')
 
             add_result(state, params, res)
-
-
-def run_simple_reaction():
-    from js_scripts import SIMPLE_REACTION_SCRIPT
-    run_test(
-        test_url='http://www.quantified-mind.com/tests/simple_reaction_time/practice',
-        js_script_template=SIMPLE_REACTION_SCRIPT,
-        # delays=[
-        #                20,  30,  40,  50,  60,  70,  80,  90,
-        #     100, 110, 120, 130, 140, 150, 160, 170, 180, 190,
-        #     200, 210, 220, 230, 240, 250, 260, 270, 280, 290,
-        #     300, 310, 320, 330, 340, 350, 360, 370, 380, 390,
-        #     400, 410, 420, 430, 440, 450, 460, 470, 480, 490,
-        #     500, 510, 520, 530, 540, 550, 560, 570, 580, 590,
-        #     600, 610, 620, 630, 640, 650, 660, 670, 680, 690,
-        # ],
-        delays=list(range(20, 600, 20)),
-        errors=[
-            0, 1, 2, 3, 4,
-            5, 6, 7, 8, 9,
-            # 10, 11, 12, 13, 14,
-            # 15, 16, 17, 18, 19,
-        ],
-        state_file='simple-reaction.json',
-    )
-
-def run_visual_matching():
-    from js_scripts import get_visual_matching_script
-    from results import results_visual_matching
-    run_test(
-        "http://www.quantified-mind.com/tests/feature_match/practice",
-        get_visual_matching_script,
-        results_visual_matching,
-        delays=[
-            # ok, so my delay was 742 on average... so let's do from 20 to 1000 in steps of 20?
-            *range(20, 1200, 20),
-            *range(30, 1200, 20),
-        ],
-        errors=[
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-        ],
-    )
-
-run_simple_reaction()
-# run_visual_matching()
 
 # ok, so it's possible to get pretty high score on matching by answering some correctly and others on random just to shift time enough
 # although I have to admit, it takes a while to do that

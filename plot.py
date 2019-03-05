@@ -65,21 +65,3 @@ def plot_results(results_file: str, title, plot_name, maxdelay, maxerrors, step=
     plt.tight_layout()
     plt.savefig(plot_name)
     plt.show()
-
-
-# plot_results(
-#     results_visual_matching,
-#     "Visual matching: dependency of score on errors and average delay (ms)",
-#     'visual-matching.png',
-#     maxdelay=1200,
-#     maxerrors=12,
-#     step=40,
-# )
-
-plot_results(
-    'simple-reaction.json',
-    "Simple reaction time: dependency of score on errors and average delay (ms)",
-    'simple-reaction-time.png',
-    maxdelay=280,
-    maxerrors=19,
-)
