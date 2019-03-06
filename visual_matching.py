@@ -30,7 +30,7 @@ def run_vm():
 def plot_vm():
     plot.plot_results(
         'visual-matching.json',
-        "Visual matching: dependency of score on errors and average delay (ms)",
+        "Visual matching: dependency of score on errors and reaction",
         'visual-matching.png',
         delays=[
             *range(20, 200, 20),

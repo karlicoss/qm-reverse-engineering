@@ -43,7 +43,7 @@ def run_sr():
 def plot_sr():
     plot.plot_results(
         'simple-reaction.json',
-        "Simple reaction time: dependency of score on errors and average delay (ms)",
+        "Simple reaction time: dependency of score on errors and reaction",
         'simple-reaction-time.png',
         delays=[
             *range(20, 200, 10),

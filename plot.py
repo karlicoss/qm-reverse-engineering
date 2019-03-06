@@ -54,7 +54,7 @@ def plot_results(results_file: str, title, plot_name, delays, max_errors):
         if len(errs) > 0:
             sns.lineplot(errs, vals, label=f"{delay:3} ms", linewidth=2, zorder=len(delays) - i)
 
-    plt.legend(fontsize='x-small')
+    plt.legend(fontsize='x-small', loc='upper right')
     plt.tight_layout()
     plt.savefig(plot_name)
     plt.show()
