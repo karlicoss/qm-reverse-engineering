@@ -4,29 +4,29 @@ import run
 import plot
 import js_scripts
 
-SAMPLES = 20
+MAX_ERRORS = 20
 
 def run_sr():
     blocks = [
         (
-            range(20, 100, 110),
-            range(0, SAMPLES + 1),
+            range(20, 100, 10),
+            range(0, MAX_ERRORS + 1),
         ),
         (
             range(20, 400, 20),
-            range(0, SAMPLES + 1),
+            range(0, MAX_ERRORS + 1),
         ),
         (
             range(20, 800, 30),
-            range(0, SAMPLES + 1),
+            range(0, MAX_ERRORS + 1),
         ),
         (
             range(20, 1010, 40),
-            range(0, SAMPLES + 1),
+            range(0, MAX_ERRORS + 1),
         ),
         (
             range(20, 1010, 10),
-            range(0, SAMPLES + 1),
+            range(0, MAX_ERRORS + 1),
         ),
     ]
 
@@ -45,8 +45,11 @@ def plot_sr():
         'simple-reaction.json',
         "Simple reaction time: dependency of score on errors and average delay (ms)",
         'simple-reaction-time.png',
-        maxdelay=800,
-        maxerrors=20,
+        delays=[
+            *range(20, 200, 10),
+            *range(200, 1010, 20),
+        ],
+        max_errors=MAX_ERRORS,
     )
 
 

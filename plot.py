@@ -10,7 +10,7 @@ import matplotlib.ticker as tck # type: ignore
 import seaborn as sns # type: ignore
 
 # TODO jitter?
-def plot_results(results_file: str, title, plot_name, maxdelay, maxerrors, step=10):
+def plot_results(results_file: str, title, plot_name, delays, max_errors):
     results = json.loads(Path(results_file).read_text())
     rdict: Dict[Tuple[int, int], float] = {}
     for params, ress in results:
@@ -24,20 +24,20 @@ def plot_results(results_file: str, title, plot_name, maxdelay, maxerrors, step=
     sns.set(style='darkgrid')
     # sns.set_palette("husl")
     # https://seaborn.pydata.org/tutorial/color_palettes.html
-    sns.set_palette("coolwarm", 50)
-    plt.figure(figsize=(20, 10))
+    sns.set_palette("cool", len(delays))
+    plt.figure(figsize=(20, 15))
     plt.title(title)
 
     plt.xlabel('Errors')
-    plt.gca().xaxis.set_major_locator(tck.MultipleLocator())
+    plt.gca().xaxis.set_major_locator(tck.MultipleLocator(base=1))
 
     plt.ylabel('Score')
-    plt.gca().yaxis.set_major_locator(tck.MultipleLocator(20))
+    # plt.gca().yaxis.set_major_locator(tck.MultipleLocator(base=step))
 
-    for delay in range(0, maxdelay + step, step):
+    for i, delay in enumerate(delays):
         errs = []
         vals = []
-        for errors in range(maxerrors + 1):
+        for errors in range(max_errors + 1):
             rr = rdict.get((delay, errors), None)
             if rr is None:
                 continue # TODO warn?
@@ -46,22 +46,15 @@ def plot_results(results_file: str, title, plot_name, maxdelay, maxerrors, step=
 
             if errors == 0: # TODO ??
                 plt.annotate(
-                    str(delay),
+                    f'{delay:<4} ms',
                     xy=(-0.3, rr),
                     fontsize=8,
+                    zorder=len(delays) + 1,
                 )
-        print(errs)
-        print(vals)
         if len(errs) > 0:
-            ints = int(delay / maxdelay * 255)
-            hv = hex(ints)[2:]
-            if len(hv) == 1:
-                hv = "0" + hv
-            # sns.scatterplot(errs, vals, label=f"{delay:3} ms", y_jitter=10)
-            sns.lineplot(errs, vals, label=f"{delay:3} ms", linewidth=2) # , color='#{cc}0000'.format(cc=hv))
+            sns.lineplot(errs, vals, label=f"{delay:3} ms", linewidth=2, zorder=len(delays) - i)
 
-
-
+    plt.legend(fontsize='x-small')
     plt.tight_layout()
     plt.savefig(plot_name)
     plt.show()
