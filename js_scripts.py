@@ -73,6 +73,8 @@ VISUAL_MATCHING_SCRIPT = """
     return true;
     }
 
+    document.getElementById('all_statistics').prepend(document.createTextNode(`simulating ${delay} ms reaction, ${errors} errors`));
+
 
     const e = document.getElementById('stimulus_left' );
 
